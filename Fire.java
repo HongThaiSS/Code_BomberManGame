@@ -1,7 +1,4 @@
-/*
- * The fire caused by explosion of bomb it stays for some duration of time if 
- * player comes at the place where there is fire then the player will die.
- */
+
 package bomberman;
 
 import java.awt.Image;
@@ -9,7 +6,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Fire extends MapBasicBlock {
+public class Fire extends MapOfBlocks {
 
     static CopyOnWriteArrayList<Fire> fire = new CopyOnWriteArrayList<Fire>();
     static int delay = 300;
@@ -19,7 +16,6 @@ public class Fire extends MapBasicBlock {
     public Fire(final Position _position, int dir) {
         super(Types.BlockType.FIRE, _position);
         direction = dir;
-
         switch (dir) {
             case 1:
                 setImage(Images.fireCenter);
@@ -37,22 +33,21 @@ public class Fire extends MapBasicBlock {
                 setImage(Images.fireUP);
                 break;
         }
-//        setImage(Images.fireCenter);
-//        if(dir)
+
         fire.add(this);
         final Fire c = this;
         fireAnimation = new Thread(new Runnable() {
             public void run() {
-                //  while (timer < explodeTimer) {
+                //  while (timer < explodsionTimer) {
                 try {
                     Thread.sleep(delay);
                     fire.remove(c);
                     breakBricks();
                     killEnemies();
                 } catch (InterruptedException e) {
-                    System.out.println("interrupted");
+                    System.out.println("");
                 }
-                //    }
+       
             }
         });
         fireAnimation.start();
@@ -97,29 +92,15 @@ public class Fire extends MapBasicBlock {
         BomberMan.map.breakBrickAtPosition(left);
         BomberMan.map.breakBrickAtPosition(right);
         System.out.println("Break Bricks Called");
-//        
-//        int x = this.getX();
-//        int y = this.getY();
-//        System.out.println("Break Bricks Called " + x + "  " + y);
-//        for (int i = 0; i < 15; i++) {
-//            for (int j = 0; j < 15; j++) {
-//                if (BomberMan.intMap[i][j] == 2) {
-//                    int diffX = x - j * 50;
-//                    int diffY = y - i * 50;
-//                    System.out.println("DX: " + diffX + " DY" + diffY);
-//                    if (diffX > -200 && diffX < 200 && diffY > -200 && diffY < 200) {
-//                        BomberMan.map.breakBrickAt(i, j);
-//                    }
-//                }
-//            }
-//        }
+       
+
     }
 
     public void killEnemies() {
         if (direction != 1) {
             return;
         }
-        ArrayList<Enemy> toBeDeleted = new ArrayList<>();
+        ArrayList<Enemy> tobeKilled = new ArrayList<>();
         int x = this.getX();
         int y = this.getY();
 
@@ -127,22 +108,22 @@ public class Fire extends MapBasicBlock {
             Rectangle enemyBounds = enemy.getBounds(enemy.direction);
             Rectangle t = new Rectangle(x + 50, y, 50, 50);
             if (t.intersects(enemyBounds)) {
-                toBeDeleted.add(enemy);
+                tobeKilled.add(enemy);
             }
             t = new Rectangle(x - 50, y, 50, 50);
             if (t.intersects(enemyBounds)) {
-                toBeDeleted.add(enemy);
+                tobeKilled.add(enemy);
             }
             t = new Rectangle(x, y + 50, 50, 50);
             if (t.intersects(enemyBounds)) {
-                toBeDeleted.add(enemy);
+                tobeKilled.add(enemy);
             }
             t = new Rectangle(x, y - 50, 50, 50);
             if (t.intersects(enemyBounds)) {
-                toBeDeleted.add(enemy);
+                tobeKilled.add(enemy);
             }
         }
-        for (Player player : BomberMan.players) {
+        for (Bomber player : BomberMan.players) {
             Rectangle playerBounds = player.getBounds(player.direction);
             Rectangle t = new Rectangle(x + 50, y, 50, 50);
             if (t.intersects(playerBounds)) {
@@ -162,9 +143,7 @@ public class Fire extends MapBasicBlock {
             }
         }
 
-        for (final Enemy i : toBeDeleted) {
-//            Thread t = new Thread(new Runnable() {public void run() {i.die();}});
-//            t.start();
+        for (final Enemy i : tobeKilled) {
             i.die();
         }
     }
